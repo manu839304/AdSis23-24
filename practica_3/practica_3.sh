@@ -62,7 +62,7 @@ case "$flag" in
 
       if id "$login" &>/dev/null
       then
-
+        usermod -d "/home/$login" -m "$login"
         tar -cf "/extra/backup/$login.tar" -C "/home" "$login"
         if test $? -ne 0
         then
