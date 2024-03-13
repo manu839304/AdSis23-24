@@ -54,6 +54,7 @@ case "$flag" in
       IFS=$'\n'
     done ;;
   -s)
+    mkdir -p "/extra/backup"
     for linea in $fichero
     do
       IFS=$', '
@@ -61,7 +62,6 @@ case "$flag" in
 
       if id "$login" &>/dev/null
       then
-        mkdir -p "/extra/backup"
 
         tar -cf "/extra/backup/$login.tar" -C "/home" "$login"
         if test $? -ne 0
