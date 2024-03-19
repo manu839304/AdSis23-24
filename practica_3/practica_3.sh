@@ -23,7 +23,7 @@ case "$flag" in
   -a)
     for linea in $fichero
     do
-      IFS=$', '
+      IFS=$','
       read -r login contrasena nombre_completo <<< "$linea"
 
       if test -z "$login" -o -z "$contrasena" -o -z "$nombre_completo"
@@ -38,17 +38,8 @@ case "$flag" in
         continue
       fi
 
-      uid=1815
-      while id "$uid" &>/dev/null
-      do
-        uid=$((uid+1))
-      done
-
-      groupadd "$login"
-      useradd -m -p "$(openssl passwd -1 "$contrasena")" -c "$nombre_completo" -e $(date -d "+30days" +%Y-%m-%d) -g "$login" -u "$uid" "$login"
-
-      cp -r /etc/skel/ "/home/$login"
-      chown -R "$login:$login" "/home/$login"
+      useradd -m -p "$(openssl passwd -1 "$contrasena")" -c "$nombre_completo" -e $(date -d "+30days" +%Y-%m-%d) -k /etc/skel -U -K UID_MIN=1815
+      echo "$login:$password" | chpasswd
 
       echo "$nombre_completo ha sido creado"
       IFS=$'\n'
@@ -57,7 +48,7 @@ case "$flag" in
     mkdir -p "/extra/backup"
     for linea in $fichero
     do
-      IFS=$', '
+      IFS=$','
       read -r login resto <<< "$linea"
 
       if id "$login" &>/dev/null
