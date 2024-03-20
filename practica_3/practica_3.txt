@@ -1,0 +1,84 @@
+845154, Lopez Torralba, Alejandro, M, 3, A
+839304, Puig Rubio, Manel Jorda, M, 3, A
+
+El usuario 'as' debe poder ejecutar comandos mediante 'sudo' sin petición
+de contraseña, por tanto, se ha añadido 'as ALL=(ALL) NOPASSWD:ALL' al fichero
+'etc/sudoers/', mediante 'visudo', con esto, al ejecutar comandos con
+privilegios de administrador, no pedirá introducir la contraseña del usuario 'as'.
+
+La primera parte del script es la que se encarga, antes de proceder a la ejecución
+completa, que el usuario tiene privilegios de administrador, para ello se ha usado
+'$EUID', una variable de entorno que almacena el ID de usuario que está ejecutando
+el script. Si el ID es 0, significa que el usuario tiene privilegios de administrador,
+si es distinto de 0 ('test "$EUID" -ne 0'), se termina la ejecución.
+
+Después, se ha realizado una comprobación del número de argumentos pasados por comando,
+mediante la variable '$#', que guarda el número de argumentos recibidos, si es distinto
+de 2 ('test "$#" -ne 2'), que es el necesario para que el script funcione, se termina
+la ejecución.
+
+Si se cumplen exitosamente los checks que se han realizado, se guardan en las variables
+'flag' y 'nomfichero' los argumentos pasados por línea de comandos, para su posterior
+uso.
+
+Se guardarán entonces, mediante la captura de la salida de la instrucción 'cat', el
+contenido del fichero pasado como argumento.
+
+Se cambia el IFS ($'\n') para que lea hasta encontrar el fin de línea.
+
+Se ha usado la lógica 'case' para diferenciar la creación ('-a') y borrado ('-s') de
+los usuarios.
+
+Si el flag indicado por consola es '-a', se ha usado un bucle for para cada línea leida
+del fichero pasado por consola, en el que para cada una, modificando IFS ($','), leerá
+hasta encontrar una coma, esto junto al comando 'read', guardará adecuadamente los
+valores de la línea en 3 variables, login, contrasena y nombre_completo, respectivamente.
+
+Mediante 3 tests del flag -z (1 para cada variable), Se comprueba si alguna de las 3
+credenciales leídas es una cadena vacía, por lo que se terminaría la ejecución del script.
+
+También se comprueba si el usuario existe mediante 'id', pasandole el nombre del usuario
+que se quiere crear.
+
+Una vez hechos todos los checks de la línea leída del fichero, se procede a la creación
+del usuario mediante el comando useradd.
+
+------------ CAMBIAR AL ARREGLAR ------------
+Se han usado las siguientes opciones:
+-m  se crea un directorio de inicio para el nuevo usuario en /home
+-p  establece la contraseña del nuevo usuario
+-c  establece el campo de comentario o descripción del usuario
+-e  establece la fecha de vencimiento de la cuenta del usuario
+-k  especifica el directorio desde el cual se copiarán los archivos de configuración
+    por defecto para el nuevo usuario
+-U  crea un grupo con el mismo nombre que el usuario y lo asigne al usuario
+-K UID_MIN=1815 establece el valor mínimo de UID
+
+Se añadirá posteriormente la contraseña mediante el comando chpasswd.
+------------ CAMBIAR AL ARREGLAR ------------
+
+Si el flag indicado por consola es '-s', se crea un fichero 'backup' en el directorio
+padre 'extra', con la opción '-p', se indica que si no existe el directorio padre 'extra',
+que se cree antes. Se ha usado un bucle for para cada línea leida del fichero pasado
+por consola, en el que para cada una, modificando IFS ($','), leerá hasta encontrar una
+coma, esto junto al comando 'read', guardará adecuadamente los valores de la línea en
+2 variables, login y resto, respectivamente, puesto que para el borrado de usuarios, no
+se necesita una contraseña, ni un nombre completo.
+
+Para ello, se comprueba si el usuario existe, como se hizo previamente ('id "$login"').
+Si existe, mediante el comando 'usermod', se cambia el directorio de inicio (home), del
+usuario a '/home/', por si era distinto, esto es necesario para crear el tar que se
+guardará en el directorio 'backup'.
+
+Una vez hecho esto, se comprueba si se ha creado con éxito, mediante 'test $? -ne 0',
+esta variable guarda el código de estado del último comando ejecutado, si es distinto
+de 0, significa que ha habido algún error, por tanto, se omitirá el borrado del usuario.
+
+Finalmente, se procede al borrado del usuario mediante el comando 'userdel' y la opción
+'-r' la cual indica que se borre también el directorio de inicio del usuario.
+
+Si el flag indicado por console es cualquier cosa distinta de '-a' o '-s', terminará la
+ejecución del script.
+
+* Para todas las terminaciones de ejecución que se han realizado en todos los checks,
+se emite el código de error 1 ('exit 1') *
