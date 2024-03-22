@@ -38,7 +38,7 @@ case "$flag" in
         continue
       fi
 
-      useradd -m -p "$(openssl passwd -1 "$contrasena")" -c "$nombre_completo" -e $(date -d "+30days" +%Y-%m-%d) -k /etc/skel -U -K UID_MIN=1815
+      useradd -m -c "$nombre_completo" -e $(date -d "+30days" +%Y-%m-%d) -k /etc/skel -U -K UID_MIN=1815
       echo "$login:$password" | chpasswd
 
       echo "$nombre_completo ha sido creado"

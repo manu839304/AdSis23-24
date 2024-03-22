@@ -43,10 +43,8 @@ que se quiere crear.
 Una vez hechos todos los checks de la línea leída del fichero, se procede a la creación
 del usuario mediante el comando useradd.
 
------------- CAMBIAR AL ARREGLAR ------------
 Se han usado las siguientes opciones:
 -m  se crea un directorio de inicio para el nuevo usuario en /home
--p  establece la contraseña del nuevo usuario
 -c  establece el campo de comentario o descripción del usuario
 -e  establece la fecha de vencimiento de la cuenta del usuario
 -k  especifica el directorio desde el cual se copiarán los archivos de configuración
@@ -55,7 +53,6 @@ Se han usado las siguientes opciones:
 -K UID_MIN=1815 establece el valor mínimo de UID
 
 Se añadirá posteriormente la contraseña mediante el comando chpasswd.
------------- CAMBIAR AL ARREGLAR ------------
 
 Si el flag indicado por consola es '-s', se crea un fichero 'backup' en el directorio
 padre 'extra', con la opción '-p', se indica que si no existe el directorio padre 'extra',
